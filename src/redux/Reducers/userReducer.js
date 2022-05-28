@@ -29,6 +29,16 @@ const initialState = {
           },
           errors: [action.payload]
         };
+      case 'LOGOUT':
+        localStorage.removeItem('token');
+        return {
+          ...state,
+          user: {
+            isLoggedIn: false,
+            user: {}
+          },
+          errors: undefined
+        };
       default:
         return state;
     }

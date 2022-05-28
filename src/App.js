@@ -1,37 +1,56 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import './App.css';
 import Layout from './layout/Layout';
+import AdminLayout from './layout/AdminLayout';
 import { getCurrentUser } from './redux/Actions';
 import Login from './views/auth/Login';
-import Dashboard from './views/Dashboard';
+import Register from './views/auth/Register';
+import UsersList from './views/users/UserList';
+import ProductList from './views/products/productsList';
 
-function PrivateRoute({ children }) {
-  const user = useSelector((state) => state.user);
-  return user.user.isLoggedIn ? children : <Navigate to="/" />;
+function PrivateRoute({ children, redirectPath='/login', user}) {
+  if(user.user){
+    if (Object.values(user.user).length === 0) {
+      return <Navigate to={redirectPath} replace />;
+    }
+  }
+  return children ? <AdminLayout>{children} </AdminLayout> : <AdminLayout> <Outlet /></AdminLayout>;
 }
 
-function AuthRoute({children}) {
-  const user = useSelector((state) => state.user);
-  return (!user.user.isLoggedIn) ? children : <Navigate to="/admin" />;
+function AuthRoute({children, user}) {
+  console.log(user)
+  if(user.user){
+    if(Object.values(user.user).length === 0){
+      return children ?  (<Layout> {children} </Layout>) : <Navigate to="/users"  replace/>;
+    }
+  }
+  return <Navigate to="/users"  replace/>
+
 }
 
 function App() {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+
   useEffect(() => {
       dispatch(getCurrentUser());
-  }, [dispatch]);
+  }, []);
   
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AuthRoute><Layout /></AuthRoute> }>
-          <Route index element={<AuthRoute><Login /></AuthRoute> } />
-        </Route>
-        <Route path="/admin" element={<PrivateRoute> <Layout /> </PrivateRoute>}>
-          <Route index element={<PrivateRoute> <Dashboard /></PrivateRoute>} />
-        </Route>
+          <Route index path="/login" element={<AuthRoute user={user.user}><Login /></AuthRoute> } />
+          <Route path='register' element={<AuthRoute user={user.user}><Register /></AuthRoute> } />
+          <Route element={<PrivateRoute user={user.user}/> }>
+            <Route path="products" element={ <ProductList />} />
+            <Route path="users" element={<UsersList />} />
+          </Route>
+          <Route
+              path="*"
+              element={<Navigate to="/login" replace />}
+          />
       </Routes>
     </BrowserRouter>
   );

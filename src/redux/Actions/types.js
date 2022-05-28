@@ -1,3 +1,10 @@
 export const LOGIN = 'LOGIN';
 export const SET_ERRORS = 'SET_ERRORS';
 export const VERIFYUSER = 'VERIFYUSER';
+export const GET_USERS = 'GET_USERS';
+export const CREATE_USER = 'CREATE_USER';
+export const UPDATE_USER = 'UPDATE_USER';
+export const DELETE_USER = 'DELETE_USER';
+export const GET_PRODUCTS = 'GET_PRODUCTS';
+export const GET_ORDERS = 'GET_ORDERS';
+export const LOGOUT = 'LOGOUT';
